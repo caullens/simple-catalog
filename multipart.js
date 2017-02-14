@@ -30,6 +30,7 @@ function multipart(req, res, next) {
     console.log(err);
     statusCode = 500;
     statusMessage = "Server error";
+	res.end("Server err");
   });
 
   // Handle data events by appending the new

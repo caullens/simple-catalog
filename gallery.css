@@ -1,3 +1,21 @@
 img {
-  width: 250px;
+  width: 150px;
+  height: 219px;
+}
+
+body {
+	padding-left: 15%;
+	padding-right: 15%;
+}
+
+#title-form {
+	padding-bottom: 10px;
+	position: relative;
+	float: left;
+}
+
+#upload-form {
+	padding-bottom: 10px;
+	padding-left: 67%;
+	position: relative;
 }

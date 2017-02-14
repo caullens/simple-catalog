@@ -57,15 +57,15 @@ function buildGallery(imageTags) {
       html += '</head>';
       html += '<body>';
       html += '  <h1>' + config.title + '</h1>';
-      html += '  <form method="GET" action="">';
+      html += '  <form method="GET" action="" id="title-form">';
       html += '    <input type="text" name="title">';
       html += '    <input type="submit" value="Change Gallery Title">';
       html += '  </form>';
-      html += imageNamesToTags(imageTags).join('');
-      html += ' <form action="" method="POST" enctype="multipart/form-data">';
+      html += ' <form action="" method="POST" enctype="multipart/form-data" id="upload-form">';
       html += '   <input type="file" name="image">';
       html += '   <input type="submit" value="Upload Image">';
       html += ' </form>';
+      html += imageNamesToTags(imageTags).join(' ');
       html += '</body>';
   return html;
 }
