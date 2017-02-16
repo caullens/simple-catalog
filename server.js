@@ -13,7 +13,6 @@ var fs = require('fs');
 var port = 2000;
 
 /* load cached files */
-var config = JSON.parse(fs.readFileSync('config.json'));
 var stylesheet = fs.readFileSync('gallery.css');
 
 /** @function getImageNames
@@ -23,7 +22,7 @@ var stylesheet = fs.readFileSync('gallery.css');
  * error and array of filenames as parameters
  */
 function getImageNames(callback) {
-  fs.readdir('images/', function(err, fileNames){
+  fs.readdir('monsters', function(err, fileNames){
     if(err) callback(err, undefined);
     else callback(false, fileNames);
   });
@@ -38,7 +37,11 @@ function getImageNames(callback) {
  */
 function imageNamesToTags(fileNames) {
   return fileNames.map(function(fileName) {
-    return `<img src="${fileName}" alt="${fileName}">`;
+    var imgString = '<div id="img-info-pair">'
+    imgString +=    `  <div id="img"><img src="${fileName}" alt="${fileName}"></div>`;
+    imgString +=    '  <div id="text"><p>This is a test paragraph to get stuff aligned properly</p></div>';
+    imgString +=    '</div>';
+    return imgString;
   });
 }
 
@@ -52,20 +55,27 @@ function imageNamesToTags(fileNames) {
 function buildGallery(imageTags) {
   var html =  '<!doctype html>';
       html += '<head>';
-      html +=   '<title>' + config.title + '</title>';
+      html +=   '<title>Monarchs</title>';
       html +=   '<link href="gallery.css" rel="stylesheet" type="text/css">'
       html += '</head>';
       html += '<body>';
-      html += '  <h1>' + config.title + '</h1>';
-      html += '  <form method="GET" action="" id="title-form">';
-      html += '    <input type="text" name="title">';
-      html += '    <input type="submit" value="Change Gallery Title">';
-      html += '  </form>';
-      html += ' <form action="" method="POST" enctype="multipart/form-data" id="upload-form">';
+      html += '  <h1>Monarchs Deck Profile</h1>';
+      html += '  <div id="monster-div">';
+      html += '    <h2 id="monster-header">Monsters</h2>';
+      html +=      imageNamesToTags(imageTags).join(' ');
+      html += '  </div>';
+      html += '  <div id="spell-div">';
+      html += '    <h2 id="spell-header">Spells</h2>';
+      html +=      imageNamesToTags(imageTags).join(' ');
+      html += '  </div>';
+      html += '  <div id="trap-div">';
+      html += '    <h2 id="trap-header">Traps</h2>';
+      html +=      imageNamesToTags(imageTags).join(' ');
+      html += '  </div>';
+      html += '  <form action="" method="POST" enctype="multipart/form-data" id="upload-form">';
       html += '   <input type="file" name="image">';
       html += '   <input type="submit" value="Upload Image">';
-      html += ' </form>';
-      html += imageNamesToTags(imageTags).join(' ');
+      html += '  </form>';
       html += '</body>';
   return html;
 }
@@ -98,7 +108,7 @@ function serveGallery(req, res) {
  * @param {http.serverResponse} - the response object
  */
 function serveImage(fileName, req, res) {
-  fs.readFile('images/' + decodeURIComponent(fileName), function(err, data){
+  fs.readFile('monsters' + decodeURIComponent(fileName), function(err, data){
     if(err) {
       console.error(err);
       res.statusCode = 404;
@@ -106,7 +116,7 @@ function serveImage(fileName, req, res) {
       res.end();
       return;
     }
-    res.setHeader('Content-Type', 'image/*');
+    res.setHeader('Content-Type', 'monsters/*');
     res.end(data);
   });
 }
@@ -128,7 +138,7 @@ function uploadImage(req, res) {
       res.end("No file specified");
       return;
     }
-    fs.writeFile('images/' + req.body.image.filename, req.body.image.data, function(err){
+    fs.writeFile('monsters' + req.body.image.filename, req.body.image.data, function(err){
       if(err) {
         console.error(err);
         res.statusCode = 500;
@@ -153,11 +163,7 @@ function handleRequest(req, res) {
   var urlParts = url.parse(req.url);
 
   if(urlParts.query){
-    var matches = /title=(.+)($|&)/.exec(urlParts.query);
-    if(matches && matches[1]){
-      config.title = decodeURIComponent(matches[1]);
-      fs.writeFile('config.json', JSON.stringify(config));
-    }
+
   }
 
   switch(urlParts.pathname) {
