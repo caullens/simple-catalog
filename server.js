@@ -7,6 +7,7 @@
 
 /* global variables */
 var multipart = require('./multipart');
+var template = require('./template');
 var http = require('http');
 var url = require('url');
 var fs = require('fs');
@@ -15,6 +16,9 @@ var port = 2000;
 /* load cached files */
 var stylesheet = fs.readFileSync('gallery.css');
 
+/* load templates */
+template.loadDir('templates');
+
 /** @function getImageNames
  * Retrieves the filenames for all images in the
  * /images directory and supplies them to the callback.
@@ -22,7 +26,7 @@ var stylesheet = fs.readFileSync('gallery.css');
  * error and array of filenames as parameters
  */
 function getImageNames(callback) {
-  fs.readdir('monsters', function(err, fileNames){
+  fs.readdir('images/monsters', function(err, fileNames){
     if(err) callback(err, undefined);
     else callback(false, fileNames);
   });
@@ -37,11 +41,9 @@ function getImageNames(callback) {
  */
 function imageNamesToTags(fileNames) {
   return fileNames.map(function(fileName) {
-    var imgString = '<div id="img-info-pair">'
-    imgString +=    `  <div id="img"><img src="${fileName}" alt="${fileName}"></div>`;
-    imgString +=    '  <div id="text"><p>This is a test paragraph to get stuff aligned properly</p></div>';
-    imgString +=    '</div>';
-    return imgString;
+    return template.render('img-info-pair.html', {
+      fileName: fileName
+    });
   });
 }
 
@@ -53,31 +55,9 @@ function imageNamesToTags(fileNames) {
  * gallery images.
  */
 function buildGallery(imageTags) {
-  var html =  '<!doctype html>';
-      html += '<head>';
-      html +=   '<title>Monarchs</title>';
-      html +=   '<link href="gallery.css" rel="stylesheet" type="text/css">'
-      html += '</head>';
-      html += '<body>';
-      html += '  <h1>Monarchs Deck Profile</h1>';
-      html += '  <div id="monster-div">';
-      html += '    <h2 id="monster-header">Monsters</h2>';
-      html +=      imageNamesToTags(imageTags).join(' ');
-      html += '  </div>';
-      html += '  <div id="spell-div">';
-      html += '    <h2 id="spell-header">Spells</h2>';
-      html +=      imageNamesToTags(imageTags).join(' ');
-      html += '  </div>';
-      html += '  <div id="trap-div">';
-      html += '    <h2 id="trap-header">Traps</h2>';
-      html +=      imageNamesToTags(imageTags).join(' ');
-      html += '  </div>';
-      html += '  <form action="" method="POST" enctype="multipart/form-data" id="upload-form">';
-      html += '   <input type="file" name="image">';
-      html += '   <input type="submit" value="Upload Image">';
-      html += '  </form>';
-      html += '</body>';
-  return html;
+  return template.render('gallery.html', {
+    imageTags: imageNamesToTags(imageTags).join(' ')
+  });
 }
 
 /** @function serveGallery
@@ -108,7 +88,7 @@ function serveGallery(req, res) {
  * @param {http.serverResponse} - the response object
  */
 function serveImage(fileName, req, res) {
-  fs.readFile('monsters' + decodeURIComponent(fileName), function(err, data){
+  fs.readFile('images/monsters' + decodeURIComponent(fileName), function(err, data){
     if(err) {
       console.error(err);
       res.statusCode = 404;
@@ -116,7 +96,7 @@ function serveImage(fileName, req, res) {
       res.end();
       return;
     }
-    res.setHeader('Content-Type', 'monsters/*');
+    res.setHeader('Content-Type', 'images/monsters/*');
     res.end(data);
   });
 }
@@ -138,7 +118,7 @@ function uploadImage(req, res) {
       res.end("No file specified");
       return;
     }
-    fs.writeFile('monsters' + req.body.image.filename, req.body.image.data, function(err){
+    fs.writeFile('images/monsters' + req.body.image.filename, req.body.image.data, function(err){
       if(err) {
         console.error(err);
         res.statusCode = 500;

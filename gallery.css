@@ -3,21 +3,18 @@
   box-sizing: border-box;
 }
 
+#img-info-pair {
+  width: 488px;
+  height: 250px;
+  padding: 10px;
+  border: 4px solid #4f718e;
+  background-color: #add8e6;
+  margin-bottom: 10px;
+}
+
 img {
   width: 150px;
   height: 219px;
-}
-
-#img {
-  float: left;
-  display: inline;
-  width: 24%;
-}
-
-h2 {
-  text-align: center;
-  position: relative;
-  color: #4f718e;
 }
 
 p {
@@ -25,13 +22,24 @@ p {
   height: 219px;
 }
 
-#text {
+#img {
   float: left;
-  display: inline;
-  width: 24%;
 }
 
-#monster-div, #spell-div, #trap-div {
-  width: 25%;
+#text {
+  float: left;
+  padding-left: 10px;
+}
+
+h2 {
   position: relative;
+  color: #4f718e;
+}
+
+#upload-image-form {
+  display: inline;
+  border: 4px solid red;
+  padding: 10px;
+  margin: 20px;
+  background-color: pink;
 }
